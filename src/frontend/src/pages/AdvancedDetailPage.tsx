@@ -333,7 +333,7 @@ export default function AdvancedDetailPage() {
             <div className="relative">
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-accent/30 blur-md" />
               <img
-                src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                 alt="Chibi Boy"
                 className="relative z-10 w-20 drop-shadow-md"
                 draggable={false}
@@ -406,7 +406,7 @@ export default function AdvancedDetailPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                 alt="Chibi Boy"
                 className="mx-auto w-24 drop-shadow-md mb-3"
                 draggable={false}

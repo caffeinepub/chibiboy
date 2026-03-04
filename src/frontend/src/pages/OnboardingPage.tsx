@@ -33,7 +33,7 @@ export default function OnboardingPage() {
           {/* Decorative glow ring behind character */}
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-36 w-36 rounded-full bg-accent/40 blur-sm" />
           <img
-            src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+            src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
             alt="Chibi Boy mascot"
             className="relative z-10 w-[260px] max-w-[70vw] drop-shadow-lg"
             draggable={false}

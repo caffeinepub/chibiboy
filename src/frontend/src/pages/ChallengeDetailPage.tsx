@@ -106,7 +106,7 @@ export default function ChallengeDetailPage() {
           >
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-16 w-16 rounded-full bg-accent/40 blur-md" />
             <img
-              src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+              src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
               alt="Chibi Boy"
               className="relative z-10 w-28 drop-shadow-md"
               draggable={false}
@@ -248,7 +248,7 @@ export default function ChallengeDetailPage() {
                 }`}
               />
               <img
-                src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                 alt="Chibi Boy"
                 className="relative z-10 w-32 drop-shadow-lg"
                 draggable={false}

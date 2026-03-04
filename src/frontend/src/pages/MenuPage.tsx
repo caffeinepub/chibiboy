@@ -10,6 +10,7 @@ import {
   BookOpen,
   Lightbulb,
   RefreshCw,
+  RotateCcw,
   Settings,
   Target,
   TrendingUp,
@@ -53,7 +54,7 @@ export default function MenuPage() {
   function handleMenuItemClick(label: string) {
     if (label === "Retos de 21 Días") {
       navigate({ to: "/retos" });
-    } else if (label === "Mis Metas") {
+    } else if (label === "Mis Metas Secundarias") {
       setShowMetas(true);
     } else if (label === "Mi Progreso") {
       setShowProgreso(true);
@@ -77,6 +78,11 @@ export default function MenuPage() {
     toast.success("¡Perfil actualizado! 🐷");
   }
 
+  function handleVerOnboarding() {
+    localStorage.removeItem("chibiBoyOnboarded");
+    navigate({ to: "/" });
+  }
+
   function handleNewTip() {
     setCurrentFrase(randomPhrase());
   }
@@ -89,7 +95,7 @@ export default function MenuPage() {
   const MENU_ITEMS = [
     {
       icon: Target,
-      label: "Mis Metas",
+      label: "Mis Metas Secundarias",
       description: "Define y sigue tus objetivos de ahorro",
       color: "bg-primary/15 text-primary",
       accent: "border-primary/30",
@@ -158,7 +164,7 @@ export default function MenuPage() {
           >
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-accent/40 blur-md" />
             <img
-              src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+              src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
               alt="Chibi Boy mascota"
               className="relative z-10 w-28 max-w-[35vw] drop-shadow-md"
               draggable={false}
@@ -202,7 +208,9 @@ export default function MenuPage() {
             )}
             {userData.metas && (
               <div>
-                <p className="text-xs text-muted-foreground">Mis metas</p>
+                <p className="text-xs text-muted-foreground">
+                  Mis metas secundarias
+                </p>
                 <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2">
                   {userData.metas}
                 </p>
@@ -227,7 +235,7 @@ export default function MenuPage() {
               return (
                 <motion.button
                   key={item.label}
-                  data-ocid={`menu.${item.label === "Retos de 21 Días" ? "primary_button" : item.label === "Mis Metas" ? "secondary_button" : "button"}.${i + 1}`}
+                  data-ocid={`menu.${item.label === "Retos de 21 Días" ? "primary_button" : item.label === "Mis Metas Secundarias" ? "secondary_button" : "button"}.${i + 1}`}
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{
@@ -338,7 +346,7 @@ export default function MenuPage() {
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-accent/30 blur-md" />
                   <img
-                    src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                    src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                     alt="Chibi Boy"
                     className="relative z-10 w-32 drop-shadow-md"
                     draggable={false}
@@ -398,14 +406,14 @@ export default function MenuPage() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
               <h2 className="font-display text-xl font-bold text-foreground">
-                Mis Metas
+                Mis Metas Secundarias
               </h2>
               <button
                 type="button"
                 data-ocid="metas.cancel_button"
                 onClick={() => setShowMetas(false)}
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground hover:bg-muted transition-colors"
-                aria-label="Cerrar mis metas"
+                aria-label="Cerrar mis metas secundarias"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -427,7 +435,7 @@ export default function MenuPage() {
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-primary/25 blur-md" />
                   <img
-                    src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                    src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                     alt="Chibi Boy"
                     className="relative z-10 w-32 drop-shadow-md"
                     draggable={false}
@@ -459,7 +467,7 @@ export default function MenuPage() {
                     htmlFor="meta-textarea"
                     className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
                   >
-                    Mi meta de ahorro
+                    Mi meta secundaria de ahorro
                   </label>
                   <Textarea
                     id="meta-textarea"
@@ -488,7 +496,7 @@ export default function MenuPage() {
                 onClick={handleSaveMeta}
                 className="flex-1 h-12 rounded-2xl bg-primary font-bold text-primary-foreground shadow-md shadow-primary/30"
               >
-                Guardar Meta 💾
+                Guardar Meta Secundaria 💾
               </Button>
             </div>
           </motion.div>
@@ -537,7 +545,7 @@ export default function MenuPage() {
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-primary/25 blur-md" />
                   <img
-                    src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                    src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                     alt="Chibi Boy"
                     className="relative z-10 w-36 drop-shadow-md"
                     draggable={false}
@@ -677,21 +685,32 @@ export default function MenuPage() {
             </ScrollArea>
 
             {/* Bottom buttons */}
-            <div className="flex gap-3 px-5 pb-8 pt-4 flex-shrink-0">
+            <div className="flex flex-col gap-3 px-5 pb-8 pt-4 flex-shrink-0">
+              <div className="flex gap-3">
+                <Button
+                  data-ocid="config.cancel_button"
+                  variant="outline"
+                  onClick={() => setShowConfig(false)}
+                  className="flex-1 h-12 rounded-2xl font-bold border-border"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  data-ocid="config.save_button"
+                  onClick={handleSaveConfig}
+                  className="flex-1 h-12 rounded-2xl bg-primary font-bold text-primary-foreground shadow-md shadow-primary/30"
+                >
+                  Guardar 💾
+                </Button>
+              </div>
               <Button
-                data-ocid="config.cancel_button"
+                data-ocid="config.secondary_button"
                 variant="outline"
-                onClick={() => setShowConfig(false)}
-                className="flex-1 h-12 rounded-2xl font-bold border-border"
+                onClick={handleVerOnboarding}
+                className="w-full h-11 rounded-2xl font-semibold border-border text-muted-foreground gap-2 hover:text-foreground hover:border-primary/40"
               >
-                Cancelar
-              </Button>
-              <Button
-                data-ocid="config.save_button"
-                onClick={handleSaveConfig}
-                className="flex-1 h-12 rounded-2xl bg-primary font-bold text-primary-foreground shadow-md shadow-primary/30"
-              >
-                Guardar 💾
+                <RotateCcw className="h-4 w-4" />
+                Ver Onboarding de nuevo
               </Button>
             </div>
           </motion.div>
@@ -735,7 +754,7 @@ export default function MenuPage() {
               <div className="relative mx-auto w-24 mb-1">
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-12 w-12 rounded-full bg-amber-400/30 blur-md" />
                 <img
-                  src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
+                  src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
                   alt="Chibi Boy"
                   className="relative z-10 w-full drop-shadow-md"
                   draggable={false}
