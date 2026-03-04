@@ -158,7 +158,7 @@ export default function MenuPage() {
           >
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-accent/40 blur-md" />
             <img
-              src="/assets/generated/chibiboy-pig-transparent.dim_400x400.png"
+              src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
               alt="Chibi Boy mascota"
               className="relative z-10 w-28 max-w-[35vw] drop-shadow-md"
               draggable={false}
@@ -338,7 +338,7 @@ export default function MenuPage() {
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-accent/30 blur-md" />
                   <img
-                    src="/assets/generated/chibiboy-pig-transparent.dim_400x400.png"
+                    src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
                     alt="Chibi Boy"
                     className="relative z-10 w-32 drop-shadow-md"
                     draggable={false}
@@ -427,7 +427,7 @@ export default function MenuPage() {
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-primary/25 blur-md" />
                   <img
-                    src="/assets/generated/chibiboy-pig-transparent.dim_400x400.png"
+                    src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
                     alt="Chibi Boy"
                     className="relative z-10 w-32 drop-shadow-md"
                     draggable={false}
@@ -537,7 +537,7 @@ export default function MenuPage() {
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-primary/25 blur-md" />
                   <img
-                    src="/assets/generated/chibiboy-pig-transparent.dim_400x400.png"
+                    src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
                     alt="Chibi Boy"
                     className="relative z-10 w-36 drop-shadow-md"
                     draggable={false}
@@ -735,7 +735,7 @@ export default function MenuPage() {
               <div className="relative mx-auto w-24 mb-1">
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-12 w-12 rounded-full bg-amber-400/30 blur-md" />
                 <img
-                  src="/assets/generated/chibiboy-pig-transparent.dim_400x400.png"
+                  src="/assets/uploads/IMG-20260303-WA0003-1.jpg"
                   alt="Chibi Boy"
                   className="relative z-10 w-full drop-shadow-md"
                   draggable={false}
