@@ -34,6 +34,10 @@ export default function MenuPage() {
   const [metaText, setMetaText] = useState<string>(
     () => localStorage.getItem("chibiBoyMeta") || "",
   );
+  const [showMetaPrincipal, setShowMetaPrincipal] = useState(false);
+  const [metaPrincipalText, setMetaPrincipalText] = useState<string>(
+    () => localStorage.getItem("chibiBoyMetaPrincipal") || "",
+  );
   const [showTips, setShowTips] = useState(false);
   const [currentFrase, setCurrentFrase] = useState<string>(() =>
     randomPhrase(),
@@ -50,7 +54,7 @@ export default function MenuPage() {
   function handleMenuItemClick(label: string) {
     if (label === "Retos de 21 Días") {
       navigate({ to: "/retos" });
-    } else if (label === "Mis Metas Secundarias") {
+    } else if (label === "Meta Principal") {
       setShowMetas(true);
     } else if (label === "Mi Progreso") {
       setShowProgreso(true);
@@ -66,6 +70,12 @@ export default function MenuPage() {
     localStorage.setItem("chibiBoyMeta", metaText);
     setShowMetas(false);
     toast.success("¡Meta guardada! Chibi está contigo. 🐷");
+  }
+
+  function handleSaveMetaPrincipal() {
+    localStorage.setItem("chibiBoyMetaPrincipal", metaPrincipalText);
+    setShowMetaPrincipal(false);
+    toast.success("¡Meta principal guardada! 🌟");
   }
 
   function handleSaveConfig() {
@@ -91,7 +101,7 @@ export default function MenuPage() {
   const MENU_ITEMS = [
     {
       icon: Target,
-      label: "Mis Metas Secundarias",
+      label: "Meta Principal",
       description: "Define y sigue tus objetivos de ahorro",
       color: "bg-primary/15 text-primary",
       accent: "border-primary/30",
@@ -185,7 +195,7 @@ export default function MenuPage() {
         </div>
 
         {/* User data card */}
-        {(userData.nombre || userData.metas) && (
+        {(userData.nombre || userData.metas || metaPrincipalText) && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -204,11 +214,17 @@ export default function MenuPage() {
                 </p>
               </div>
             )}
+            {metaPrincipalText && (
+              <div className="mb-1.5">
+                <p className="text-xs text-muted-foreground">Meta principal</p>
+                <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2">
+                  {metaPrincipalText}
+                </p>
+              </div>
+            )}
             {userData.metas && (
               <div>
-                <p className="text-xs text-muted-foreground">
-                  Mis metas secundarias
-                </p>
+                <p className="text-xs text-muted-foreground">Meta principal</p>
                 <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2">
                   {userData.metas}
                 </p>
@@ -233,7 +249,7 @@ export default function MenuPage() {
               return (
                 <motion.button
                   key={item.label}
-                  data-ocid={`menu.${item.label === "Retos de 21 Días" ? "primary_button" : item.label === "Mis Metas Secundarias" ? "secondary_button" : "button"}.${i + 1}`}
+                  data-ocid={`menu.${item.label === "Retos de 21 Días" ? "primary_button" : item.label === "Meta Principal" ? "primary_button" : item.label === "Mis Metas Secundarias" ? "secondary_button" : "button"}.${i + 1}`}
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{
@@ -301,6 +317,116 @@ export default function MenuPage() {
         </div>
       </div>
 
+      {/* Meta Principal Overlay */}
+      <AnimatePresence>
+        {showMetaPrincipal && (
+          <motion.div
+            data-ocid="meta-principal.dialog"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col bg-background"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
+              <h2 className="font-display text-xl font-bold text-foreground">
+                Meta Principal
+              </h2>
+              <button
+                type="button"
+                data-ocid="meta-principal.close_button"
+                onClick={() => setShowMetaPrincipal(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground hover:bg-muted transition-colors"
+                aria-label="Cerrar meta principal"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <ScrollArea className="flex-1 px-5">
+              <div className="flex flex-col items-center pb-8">
+                {/* Pig */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{
+                    delay: 0.1,
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20,
+                  }}
+                  className="relative mb-1"
+                >
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-yellow-400/25 blur-md" />
+                  <img
+                    src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
+                    alt="Chibi Boy"
+                    className="relative z-10 w-32 drop-shadow-md"
+                    draggable={false}
+                  />
+                </motion.div>
+
+                {/* Speech bubble */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="relative w-full max-w-sm rounded-2xl bg-yellow-400/15 border border-yellow-400/30 px-4 py-4 mt-2"
+                >
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 h-0 w-0 border-l-[8px] border-r-[8px] border-b-[10px] border-l-transparent border-r-transparent border-b-yellow-400/15" />
+                  <p className="text-sm text-foreground leading-relaxed font-medium">
+                    ¿Cuál es tu meta principal? ¿Para qué quieres ahorrar? Dime
+                    tu gran objetivo y lo vamos a lograr juntos. 🌟🐷
+                  </p>
+                </motion.div>
+
+                {/* Textarea */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="w-full max-w-sm mt-5"
+                >
+                  <label
+                    htmlFor="meta-principal-textarea"
+                    className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-2"
+                  >
+                    Mi Meta Principal
+                  </label>
+                  <Textarea
+                    id="meta-principal-textarea"
+                    data-ocid="meta-principal.textarea"
+                    value={metaPrincipalText}
+                    onChange={(e) => setMetaPrincipalText(e.target.value)}
+                    placeholder="Escribe aquí tu meta principal de ahorro..."
+                    className="min-h-[120px] resize-none rounded-2xl border-yellow-400/40 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-yellow-400"
+                  />
+                </motion.div>
+              </div>
+            </ScrollArea>
+
+            {/* Bottom buttons */}
+            <div className="flex gap-3 px-5 pb-8 pt-4 flex-shrink-0">
+              <Button
+                data-ocid="meta-principal.cancel_button"
+                variant="outline"
+                onClick={() => setShowMetaPrincipal(false)}
+                className="flex-1 h-12 rounded-2xl font-bold border-border"
+              >
+                Volver
+              </Button>
+              <Button
+                data-ocid="meta-principal.save_button"
+                onClick={handleSaveMetaPrincipal}
+                className="flex-1 h-12 rounded-2xl bg-yellow-500 hover:bg-yellow-600 font-bold text-white shadow-md shadow-yellow-500/30"
+              >
+                Guardar Meta 💾
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mis Metas Overlay */}
       <AnimatePresence>
         {showMetas && (
@@ -314,7 +440,7 @@ export default function MenuPage() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
               <h2 className="font-display text-xl font-bold text-foreground">
-                Mis Metas Secundarias
+                Meta Principal
               </h2>
               <button
                 type="button"
@@ -375,7 +501,7 @@ export default function MenuPage() {
                     htmlFor="meta-textarea"
                     className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
                   >
-                    Mi meta secundaria de ahorro
+                    Mi Meta Principal de ahorro
                   </label>
                   <Textarea
                     id="meta-textarea"
@@ -404,7 +530,7 @@ export default function MenuPage() {
                 onClick={handleSaveMeta}
                 className="flex-1 h-12 rounded-2xl bg-primary font-bold text-primary-foreground shadow-md shadow-primary/30"
               >
-                Guardar Meta Secundaria 💾
+                Guardar Meta Principal 💾
               </Button>
             </div>
           </motion.div>
