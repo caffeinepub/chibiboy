@@ -22,10 +22,12 @@ export default function ChallengeDetailPage() {
   const dayNumber = Number.parseInt(params.day, 10);
   const dayIndex = dayNumber - 1;
 
-  const { setDayStatus } = useChallenges();
+  const { setDayStatus, getExtraValue } = useChallenges();
   const [showResult, setShowResult] = useState<ResultState | null>(null);
 
   const challenge = CHALLENGES[level]?.[dayIndex];
+  const extraValue = getExtraValue(level, dayIndex);
+  const totalValue = (challenge?.value ?? 0) + extraValue;
 
   if (!challenge) {
     navigate({ to: "/retos" });
@@ -140,10 +142,20 @@ export default function ChallengeDetailPage() {
           <p className="text-base text-foreground leading-relaxed">
             {challenge.description}
           </p>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
               💰 Valor: ${challenge.value} pesos
             </div>
+            {extraValue > 0 && (
+              <div className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1 text-xs font-bold text-amber-600">
+                +${extraValue} dispersados de retos anteriores
+              </div>
+            )}
+            {extraValue > 0 && (
+              <div className="mt-1 w-full rounded-xl bg-green-500/10 border border-green-400/30 px-3 py-1.5 text-xs font-bold text-green-700">
+                ✨ Total si lo logras: ${totalValue} pesos
+              </div>
+            )}
           </div>
         </motion.div>
 

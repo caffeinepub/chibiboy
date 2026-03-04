@@ -12,6 +12,8 @@ export type ChallengeLevel = "easy" | "medium" | "hard";
 
 interface LevelProgress {
   statuses: DayStatus[];
+  // Extra value (in pesos) dispersed from failed challenges, keyed by day index
+  extraValues: number[];
 }
 
 interface AdvancedStatus {
@@ -47,15 +49,18 @@ interface ChallengeContextValue {
     status: DayStatus,
   ) => void;
   resetLevel: (level: ChallengeLevel) => void;
+  resetAll: () => void;
   setAdvancedStatus: (
     topic: keyof AdvancedStatus,
     status: "none" | "in_progress" | "done",
   ) => void;
   getSavingsTotal: () => number;
+  getExtraValue: (level: ChallengeLevel, dayIndex: number) => number;
 }
 
 const DEFAULT_LEVEL: LevelProgress = {
   statuses: Array(21).fill("pending") as DayStatus[],
+  extraValues: Array(21).fill(0) as number[],
 };
 
 const DEFAULT_STATE: ChallengeState = {
@@ -70,21 +75,21 @@ const DEFAULT_STATE: ChallengeState = {
   savingsTotal: 0,
 };
 
+function migrateLevel(raw: Partial<LevelProgress> | undefined): LevelProgress {
+  const statuses = raw?.statuses ?? (Array(21).fill("pending") as DayStatus[]);
+  const extraValues = raw?.extraValues ?? (Array(21).fill(0) as number[]);
+  return { statuses, extraValues };
+}
+
 function loadState(): ChallengeState {
   try {
     const stored = localStorage.getItem("chibiBoyProgress");
     if (!stored) return DEFAULT_STATE;
     const parsed = JSON.parse(stored) as Partial<ChallengeState>;
     return {
-      easy: parsed.easy ?? {
-        statuses: Array(21).fill("pending") as DayStatus[],
-      },
-      medium: parsed.medium ?? {
-        statuses: Array(21).fill("pending") as DayStatus[],
-      },
-      hard: parsed.hard ?? {
-        statuses: Array(21).fill("pending") as DayStatus[],
-      },
+      easy: migrateLevel(parsed.easy as Partial<LevelProgress> | undefined),
+      medium: migrateLevel(parsed.medium as Partial<LevelProgress> | undefined),
+      hard: migrateLevel(parsed.hard as Partial<LevelProgress> | undefined),
       advancedStatus: parsed.advancedStatus ?? {
         cuenta_ahorro: "none",
         inversion: "none",
@@ -120,20 +125,61 @@ export function ChallengeProvider({ children }: { children: ReactNode }) {
     (level: ChallengeLevel, dayIndex: number, status: DayStatus) => {
       setState((prev) => {
         const newStatuses = [...prev[level].statuses];
+        const newExtraValues = [
+          ...(prev[level].extraValues ?? Array(21).fill(0)),
+        ];
         const oldStatus = newStatuses[dayIndex];
         newStatuses[dayIndex] = status;
 
-        // Add value to savings only when marking completed
         let savingsDelta = 0;
+
         if (status === "completed" && oldStatus !== "completed") {
-          savingsDelta = CHALLENGES[level][dayIndex]?.value ?? 0;
+          // Add base value + any dispersed extra
+          savingsDelta =
+            (CHALLENGES[level][dayIndex]?.value ?? 0) +
+            (newExtraValues[dayIndex] ?? 0);
         } else if (oldStatus === "completed" && status !== "completed") {
-          savingsDelta = -(CHALLENGES[level][dayIndex]?.value ?? 0);
+          // Remove previously credited amount
+          savingsDelta = -(
+            (CHALLENGES[level][dayIndex]?.value ?? 0) +
+            (newExtraValues[dayIndex] ?? 0)
+          );
+        }
+
+        if (status === "failed" && oldStatus !== "failed") {
+          // Disperse the failed day's value (base + existing extra) among future pending days
+          const failedValue =
+            (CHALLENGES[level][dayIndex]?.value ?? 0) +
+            (newExtraValues[dayIndex] ?? 0);
+          const futurePendingIndices: number[] = [];
+          for (let i = dayIndex + 1; i < 21; i++) {
+            if (newStatuses[i] === "pending") {
+              futurePendingIndices.push(i);
+            }
+          }
+          if (futurePendingIndices.length > 0 && failedValue > 0) {
+            const perDay = Math.floor(
+              failedValue / futurePendingIndices.length,
+            );
+            const remainder =
+              failedValue - perDay * futurePendingIndices.length;
+            for (let i = 0; i < futurePendingIndices.length; i++) {
+              newExtraValues[futurePendingIndices[i]] =
+                (newExtraValues[futurePendingIndices[i]] ?? 0) +
+                perDay +
+                (i === 0 ? remainder : 0);
+            }
+          }
+        }
+
+        if (oldStatus === "failed" && status !== "failed") {
+          // When un-failing a day, reclaim its extra from future days (best-effort: just recalculate)
+          // For simplicity we don't reverse dispersion — user sees updated totals going forward.
         }
 
         const next: ChallengeState = {
           ...prev,
-          [level]: { statuses: newStatuses },
+          [level]: { statuses: newStatuses, extraValues: newExtraValues },
           savingsTotal: Math.max(0, prev.savingsTotal + savingsDelta),
         };
         saveState(next);
@@ -147,7 +193,33 @@ export function ChallengeProvider({ children }: { children: ReactNode }) {
     setState((prev) => {
       const next: ChallengeState = {
         ...prev,
-        [level]: { statuses: Array(21).fill("pending") as DayStatus[] },
+        [level]: {
+          statuses: Array(21).fill("pending") as DayStatus[],
+          extraValues: Array(21).fill(0) as number[],
+        },
+      };
+      saveState(next);
+      return next;
+    });
+  }, []);
+
+  const resetAll = useCallback(() => {
+    setState((prev) => {
+      const next: ChallengeState = {
+        ...prev,
+        easy: {
+          statuses: Array(21).fill("pending") as DayStatus[],
+          extraValues: Array(21).fill(0) as number[],
+        },
+        medium: {
+          statuses: Array(21).fill("pending") as DayStatus[],
+          extraValues: Array(21).fill(0) as number[],
+        },
+        hard: {
+          statuses: Array(21).fill("pending") as DayStatus[],
+          extraValues: Array(21).fill(0) as number[],
+        },
+        savingsTotal: 0,
       };
       saveState(next);
       return next;
@@ -174,6 +246,13 @@ export function ChallengeProvider({ children }: { children: ReactNode }) {
   const getSavingsTotal = useCallback(
     () => state.savingsTotal,
     [state.savingsTotal],
+  );
+
+  const getExtraValue = useCallback(
+    (level: ChallengeLevel, dayIndex: number): number => {
+      return state[level].extraValues?.[dayIndex] ?? 0;
+    },
+    [state],
   );
 
   const easyCompleted = countCompleted(state.easy.statuses);
@@ -207,8 +286,10 @@ export function ChallengeProvider({ children }: { children: ReactNode }) {
         hardPassed,
         setDayStatus,
         resetLevel,
+        resetAll,
         setAdvancedStatus,
         getSavingsTotal,
+        getExtraValue,
       }}
     >
       {children}

@@ -1,7 +1,18 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { useChallenges } from "@/context/ChallengeContext";
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, Lock } from "lucide-react";
+import { ChevronLeft, Lock, RotateCcw } from "lucide-react";
 import { motion } from "motion/react";
 
 interface LevelCardProps {
@@ -117,6 +128,7 @@ export default function ChallengesPage() {
     easyPassed,
     mediumPassed,
     hardPassed,
+    resetAll,
   } = useChallenges();
 
   const easyCompleted = state.easy.statuses.filter(
@@ -159,7 +171,7 @@ export default function ChallengesPage() {
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="font-display text-2xl font-bold leading-tight text-foreground">
             Retos de 21 Días
           </h1>
@@ -167,6 +179,43 @@ export default function ChallengesPage() {
             Elige tu nivel de desafío
           </p>
         </div>
+
+        {/* Reset all button */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              type="button"
+              data-ocid="retos.delete_button"
+              aria-label="Restaurar todos los retos"
+              className="flex items-center gap-1.5 rounded-full bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 shadow-sm transition-all hover:bg-red-100 active:scale-95"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Restaurar
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent data-ocid="retos.dialog">
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Restaurar todos los retos?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Se borrarán todos tus avances en los niveles Fácil, Medio y
+                Difícil, y el total ahorrado por retos volverá a cero. Esta
+                acción no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel data-ocid="retos.cancel_button">
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                data-ocid="retos.confirm_button"
+                onClick={resetAll}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Sí, restaurar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </motion.header>
 
       {/* Mascot */}

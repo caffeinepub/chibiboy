@@ -21,9 +21,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const INSTRUCTIONS_TEXT =
-  "Hola, soy Chibi. Bienvenido a Chibi Boy Savings. Estoy aquí para acompañarte a crear un mejor hábito con tu dinero, paso a paso. Aquí encontrarás retos de 21 días. Cada día eliges si lo lograste o no lo lograste. No pasa nada si fallas, lo importante es avanzar. Cuando completas al menos el 80%, desbloqueas el siguiente nivel. Cada reto tiene un valor. Cuando marcas lo logré, ese dinero se suma a tu alcancía. Si repites un reto, también vuelve a contar. Aquí celebramos la constancia. También puedes crear metas. Tú decides cuánto quieres ahorrar y en cuántos días. Cada día que cumples, el monto se suma automáticamente. Aquí encontrarás tips de ahorro y finanzas. Mi recomendación, lee uno al día. Son pequeños recordatorios que, juntos, hacen una gran diferencia. Cuando llegas al nivel avanzado, entras al mundo real del dinero. Aquí aprenderás sobre ahorro inteligente, inversión y decisiones financieras reales. En la pantalla principal, verás mi alcancía. Al tocarla, te diré cuánto dinero has acumulado con retos y metas. No es solo dinero, son decisiones que cuentan. Recuerda, no se trata de hacerlo perfecto, se trata de hacerlo consciente. Yo te acompañaré en todo tu proceso.";
-
 function randomPhrase(): string {
   return ALL_PHRASES[Math.floor(Math.random() * ALL_PHRASES.length)];
 }
@@ -33,7 +30,6 @@ export default function MenuPage() {
   const { getSavingsTotal } = useChallenges();
   const navigate = useNavigate();
 
-  const [showInstructions, setShowInstructions] = useState(false);
   const [showMetas, setShowMetas] = useState(false);
   const [metaText, setMetaText] = useState<string>(
     () => localStorage.getItem("chibiBoyMeta") || "",
@@ -146,7 +142,9 @@ export default function MenuPage() {
             data-ocid="menu.open_modal_button"
             variant="outline"
             size="sm"
-            onClick={() => setShowInstructions(true)}
+            onClick={() =>
+              window.open("https://youtube.com/shorts/VmwrV0qycxE", "_blank")
+            }
             className="flex items-center gap-1.5 rounded-full border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20 h-8"
           >
             <BookOpen className="h-3.5 w-3.5" />
@@ -302,96 +300,6 @@ export default function MenuPage() {
           </p>
         </div>
       </div>
-
-      {/* Instructions Overlay */}
-      <AnimatePresence>
-        {showInstructions && (
-          <motion.div
-            data-ocid="menu.dialog"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col bg-background"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
-              <h2 className="font-display text-xl font-bold text-foreground">
-                Instrucciones
-              </h2>
-              <button
-                type="button"
-                data-ocid="menu.close_button"
-                onClick={() => setShowInstructions(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-foreground hover:bg-muted transition-colors"
-                aria-label="Cerrar instrucciones"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Scrollable content */}
-            <ScrollArea className="flex-1 px-5">
-              <div className="flex flex-col items-center pb-8">
-                {/* Pig */}
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{
-                    delay: 0.1,
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 20,
-                  }}
-                  className="relative mb-1"
-                >
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-accent/30 blur-md" />
-                  <img
-                    src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
-                    alt="Chibi Boy"
-                    className="relative z-10 w-32 drop-shadow-md"
-                    draggable={false}
-                  />
-                </motion.div>
-
-                {/* Speech bubble */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="relative w-full max-w-sm rounded-2xl bg-accent/20 border border-accent/40 px-4 py-4 mt-2"
-                >
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 h-0 w-0 border-l-[8px] border-r-[8px] border-b-[10px] border-l-transparent border-r-transparent border-b-accent/20" />
-                  <p className="text-sm text-foreground leading-relaxed">
-                    {INSTRUCTIONS_TEXT}
-                  </p>
-                </motion.div>
-              </div>
-            </ScrollArea>
-
-            {/* Bottom buttons */}
-            <div className="flex gap-3 px-5 pb-8 pt-4 flex-shrink-0">
-              <Button
-                data-ocid="menu.cancel_button"
-                variant="outline"
-                onClick={() => setShowInstructions(false)}
-                className="flex-1 h-12 rounded-2xl font-bold border-border"
-              >
-                Menú
-              </Button>
-              <Button
-                data-ocid="menu.primary_button"
-                onClick={() => {
-                  setShowInstructions(false);
-                  navigate({ to: "/retos" });
-                }}
-                className="flex-1 h-12 rounded-2xl bg-primary font-bold text-primary-foreground shadow-md shadow-primary/30"
-              >
-                Reto 🏆
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Mis Metas Overlay */}
       <AnimatePresence>
@@ -746,8 +654,11 @@ export default function MenuPage() {
               </div>
 
               {/* Title */}
-              <p className="text-xs font-extrabold text-amber-500 uppercase tracking-widest mb-3">
+              <p className="text-xs font-extrabold text-amber-500 uppercase tracking-widest mb-1">
                 TIPS DE AHORRO 💡
+              </p>
+              <p className="text-[10px] text-amber-600/80 font-semibold mb-3">
+                (Tips recomendados por el Banco de México)
               </p>
 
               {/* Pig */}
