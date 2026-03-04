@@ -61,7 +61,7 @@ export default function ChallengeDetailPage() {
   return (
     <div
       data-ocid="detail.page"
-      className="relative flex h-screen w-full flex-col overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background"
     >
       {/* Decorative blobs */}
       <div
@@ -97,7 +97,7 @@ export default function ChallengeDetailPage() {
       </motion.header>
 
       {/* Content */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-5 pb-6">
+      <div className="relative z-10 px-5 pb-6">
         {/* Mascot with speech bubble */}
         <div className="flex flex-col items-center mb-5">
           <motion.div

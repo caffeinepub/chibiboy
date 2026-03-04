@@ -271,7 +271,7 @@ export default function MenuPage() {
   return (
     <div
       data-ocid="menu.page"
-      className="relative flex h-screen w-full flex-col overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background"
     >
       {/* Decorative blobs */}
       <div
@@ -283,7 +283,7 @@ export default function MenuPage() {
         <div className="absolute top-1/3 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-accent/15 blur-2xl" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full overflow-y-auto">
+      <div className="relative z-10 flex flex-col">
         {/* Top bar */}
         <div className="flex items-center justify-between px-5 pt-10 pb-0">
           <div className="flex-1" />

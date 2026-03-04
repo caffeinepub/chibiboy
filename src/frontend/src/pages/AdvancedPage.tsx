@@ -97,7 +97,7 @@ export default function AdvancedPage() {
   return (
     <div
       data-ocid="avanzado.page"
-      className="relative flex h-screen w-full flex-col overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background"
     >
       {/* Decorative blobs */}
       <div
@@ -177,7 +177,7 @@ export default function AdvancedPage() {
       </div>
 
       {/* Topic buttons */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-8 space-y-3">
+      <div className="relative z-10 px-4 pb-8 space-y-3">
         <TopicButton
           ocid="avanzado.primary_button.1"
           icon="🏦"

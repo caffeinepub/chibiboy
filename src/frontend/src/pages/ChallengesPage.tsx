@@ -144,7 +144,7 @@ export default function ChallengesPage() {
   return (
     <div
       data-ocid="retos.page"
-      className="relative flex h-screen w-full flex-col overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background"
     >
       {/* Decorative blobs */}
       <div
@@ -250,7 +250,7 @@ export default function ChallengesPage() {
       </div>
 
       {/* Level cards */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-8 space-y-3">
+      <div className="relative z-10 px-4 pb-8 space-y-3">
         <LevelCard
           ocid="retos.primary_button.1"
           emoji="🟢"

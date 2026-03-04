@@ -116,7 +116,7 @@ export default function ChallengeDaysPage() {
   return (
     <div
       data-ocid="days.page"
-      className="relative flex h-screen w-full flex-col overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background"
     >
       {/* Decorative blobs */}
       <div
@@ -169,7 +169,7 @@ export default function ChallengeDaysPage() {
       </div>
 
       {/* Day Grid */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-6">
+      <div className="relative z-10 px-4 pb-6">
         <div className="grid grid-cols-3 gap-2.5">
           {statuses.map((status, index) => {
             const dayNumber = index + 1;
