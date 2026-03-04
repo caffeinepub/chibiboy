@@ -144,7 +144,7 @@ export default function ChallengesPage() {
   return (
     <div
       data-ocid="retos.page"
-      className="relative flex min-h-screen w-full flex-col bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background overflow-y-auto"
     >
       {/* Decorative blobs */}
       <div

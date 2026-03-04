@@ -97,7 +97,7 @@ export default function AdvancedPage() {
   return (
     <div
       data-ocid="avanzado.page"
-      className="relative flex min-h-screen w-full flex-col bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background overflow-y-auto"
     >
       {/* Decorative blobs */}
       <div

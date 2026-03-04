@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChallenges } from "@/context/ChallengeContext";
 import { useUserData } from "@/context/UserContext";
 import { useNavigate, useParams } from "@tanstack/react-router";
@@ -244,7 +243,7 @@ export default function AdvancedDetailPage() {
   return (
     <div
       data-ocid="avanzado-detail.page"
-      className="relative flex h-screen w-full flex-col overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background overflow-y-auto"
     >
       {/* Decorative blobs */}
       <div
@@ -260,7 +259,7 @@ export default function AdvancedDetailPage() {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative z-10 flex items-center gap-3 px-4 pt-10 pb-3 flex-shrink-0"
+        className="sticky top-0 z-20 bg-background/95 backdrop-blur relative flex items-center gap-3 px-4 pt-10 pb-3"
       >
         <button
           type="button"
@@ -279,7 +278,7 @@ export default function AdvancedDetailPage() {
       </motion.header>
 
       {/* Scrollable body */}
-      <ScrollArea className="relative z-10 flex-1">
+      <div className="relative z-10 flex-1">
         <div className="px-4 pb-6 space-y-4">
           {/* Subtitle */}
           <motion.p
@@ -379,7 +378,7 @@ export default function AdvancedDetailPage() {
             </Button>
           </motion.div>
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Fireworks */}
       <AnimatePresence>

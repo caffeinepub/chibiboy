@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChallenges } from "@/context/ChallengeContext";
 import { useUserData } from "@/context/UserContext";
 import { ALL_PHRASES } from "@/data/phrases";
@@ -24,14 +23,14 @@ import { toast } from "sonner";
 
 // ---------- Meta Principal helpers ----------
 interface MetaPrincipalData {
-  nombre: string; // nombre de la meta
-  monto: number; // monto total a ahorrar
-  plazo: number; // días
-  ahorroPorDia: number; // calculado
-  ahorroAcumulado: number; // lo que lleva ahorrado de esta meta
-  extraPorDia: number; // extra dispersado de días fallidos
-  ultimaFechaLogro: string; // ISO date string del último día en que se marcó
-  ultimaFechaFallo: string; // ISO date string del último día en que se falló
+  nombre: string;
+  monto: number;
+  plazo: number;
+  ahorroPorDia: number;
+  ahorroAcumulado: number;
+  extraPorDia: number;
+  ultimaFechaLogro: string;
+  ultimaFechaFallo: string;
   historialDias: { fecha: string; logrado: boolean; monto: number }[];
 }
 
@@ -207,7 +206,6 @@ export default function MenuPage() {
   function handleNoLogrado() {
     if (!metaData || alreadyActedToday) return;
     const montoDia = metaData.ahorroPorDia + metaData.extraPorDia;
-    // Disperse failed amount into next days
     const diasRestantes = calcDiasRestantes(metaData);
     const extraNuevo = diasRestantes > 0 ? montoDia / diasRestantes : 0;
     const updated: MetaPrincipalData = {
@@ -271,7 +269,7 @@ export default function MenuPage() {
   return (
     <div
       data-ocid="menu.page"
-      className="relative flex min-h-screen w-full flex-col bg-background"
+      className="relative flex min-h-screen w-full flex-col bg-background overflow-y-auto"
     >
       {/* Decorative blobs */}
       <div
@@ -452,13 +450,15 @@ export default function MenuPage() {
         {showMetaPrincipal && (
           <motion.div
             data-ocid="meta-principal.dialog"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col bg-background"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className="fixed inset-0 z-50 bg-background overflow-y-auto overscroll-contain"
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
+            {/* Header sticky */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-between px-5 pt-10 pb-4 border-b border-border/30">
               <h2 className="font-display text-xl font-bold text-foreground">
                 Meta Principal 🌟
               </h2>
@@ -476,9 +476,10 @@ export default function MenuPage() {
               </button>
             </div>
 
-            <ScrollArea className="flex-1 px-5">
-              <div className="flex flex-col items-center pb-8 max-w-sm mx-auto w-full">
-                {/* Pig */}
+            {/* Scrollable content */}
+            <div className="px-5 pb-10 pt-4 max-w-sm mx-auto w-full">
+              {/* Pig */}
+              <div className="flex justify-center mb-2">
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -488,7 +489,7 @@ export default function MenuPage() {
                     stiffness: 260,
                     damping: 20,
                   }}
-                  className="relative mb-1"
+                  className="relative"
                 >
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-yellow-400/25 blur-md" />
                   <img
@@ -498,295 +499,316 @@ export default function MenuPage() {
                     draggable={false}
                   />
                 </motion.div>
+              </div>
 
-                {/* ---- NO META YET or FORM ---- */}
-                {!metaData || showForm ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="w-full"
-                  >
-                    {/* Instruction bubble */}
-                    <div className="relative w-full rounded-2xl bg-yellow-400/15 border border-yellow-400/30 px-4 py-4 mb-5">
-                      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 h-0 w-0 border-l-[8px] border-r-[8px] border-b-[10px] border-l-transparent border-r-transparent border-b-yellow-400/15" />
-                      <p className="text-sm font-bold text-foreground mb-1">
-                        ¡Hola! Soy Chibi. 🐷
-                      </p>
-                      <p className="text-sm text-foreground/80 leading-relaxed">
-                        Pon una meta de ahorro, dime cuánto necesitas y en
-                        cuántos días quieres lograrlo. Yo calcularé
-                        automáticamente cuánto debes ahorrar cada día. Cada día
-                        podrás marcar si lo lograste o no.
-                      </p>
+              {/* ---- NO META YET or FORM ---- */}
+              {!metaData || showForm ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="w-full"
+                >
+                  {/* Instruction bubble */}
+                  <div className="relative w-full rounded-2xl bg-yellow-400/15 border border-yellow-400/30 px-4 py-4 mb-5">
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 h-0 w-0 border-l-[8px] border-r-[8px] border-b-[10px] border-l-transparent border-r-transparent border-b-yellow-400/15" />
+                    <p className="text-sm font-bold text-foreground mb-1">
+                      ¡Hola! Soy Chibi. 🐷
+                    </p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      Pon una meta de ahorro, dime cuánto necesitas y en cuántos
+                      días quieres lograrlo. Yo calcularé automáticamente cuánto
+                      debes ahorrar cada día. Cada día podrás marcar si lo
+                      lograste o no.
+                    </p>
+                  </div>
+
+                  {/* Form */}
+                  <div className="flex flex-col gap-4 w-full">
+                    <div>
+                      <label
+                        htmlFor="meta-nombre"
+                        className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1"
+                      >
+                        ¿Cuál es tu meta? (nombre)
+                      </label>
+                      <Input
+                        id="meta-nombre"
+                        data-ocid="meta-principal.nombre.input"
+                        value={formNombre}
+                        onChange={(e) => setFormNombre(e.target.value)}
+                        placeholder="Ej: mis tenis nuevos, viaje, laptop..."
+                        className="rounded-2xl border-yellow-400/40 bg-card h-12"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="meta-monto"
+                        className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1"
+                      >
+                        ¿Cuánto necesitas ahorrar? ($)
+                      </label>
+                      <Input
+                        id="meta-monto"
+                        data-ocid="meta-principal.monto.input"
+                        type="number"
+                        value={formMonto}
+                        onChange={(e) => setFormMonto(e.target.value)}
+                        placeholder="Ej: 500"
+                        className="rounded-2xl border-yellow-400/40 bg-card h-12"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="meta-plazo"
+                        className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1"
+                      >
+                        ¿En cuántos días? (plazo)
+                      </label>
+                      <Input
+                        id="meta-plazo"
+                        data-ocid="meta-principal.plazo.input"
+                        type="number"
+                        value={formPlazo}
+                        onChange={(e) => setFormPlazo(e.target.value)}
+                        placeholder="Ej: 30"
+                        className="rounded-2xl border-yellow-400/40 bg-card h-12"
+                      />
                     </div>
 
-                    {/* Form */}
-                    <div className="flex flex-col gap-4 w-full">
-                      <div>
-                        <label
-                          htmlFor="meta-nombre"
-                          className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1"
+                    {/* Auto-calculation preview */}
+                    {formMonto &&
+                      formPlazo &&
+                      Number.parseFloat(formMonto) > 0 &&
+                      Number.parseInt(formPlazo) > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="rounded-2xl bg-green-500/15 border border-green-500/30 px-4 py-4 text-center"
                         >
-                          ¿Cuál es tu meta? (nombre)
-                        </label>
-                        <Input
-                          id="meta-nombre"
-                          data-ocid="meta-principal.input"
-                          value={formNombre}
-                          onChange={(e) => setFormNombre(e.target.value)}
-                          placeholder="Ej: mis tenis nuevos, viaje, laptop..."
-                          className="rounded-2xl border-yellow-400/40 bg-card h-12"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="meta-monto"
-                          className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1"
-                        >
-                          ¿Cuánto necesitas ahorrar? ($)
-                        </label>
-                        <Input
-                          id="meta-monto"
-                          data-ocid="meta-principal.input"
-                          type="number"
-                          value={formMonto}
-                          onChange={(e) => setFormMonto(e.target.value)}
-                          placeholder="Ej: 500"
-                          className="rounded-2xl border-yellow-400/40 bg-card h-12"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="meta-plazo"
-                          className="block text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1"
-                        >
-                          ¿En cuántos días? (plazo)
-                        </label>
-                        <Input
-                          id="meta-plazo"
-                          data-ocid="meta-principal.input"
-                          type="number"
-                          value={formPlazo}
-                          onChange={(e) => setFormPlazo(e.target.value)}
-                          placeholder="Ej: 30"
-                          className="rounded-2xl border-yellow-400/40 bg-card h-12"
-                        />
-                      </div>
-
-                      {/* Auto-calculation preview */}
-                      {formMonto &&
-                        formPlazo &&
-                        Number.parseFloat(formMonto) > 0 &&
-                        Number.parseInt(formPlazo) > 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="rounded-2xl bg-green-500/15 border border-green-500/30 px-4 py-3 text-center"
-                          >
-                            <p className="text-xs text-green-700 font-bold uppercase tracking-wide mb-1">
-                              Cálculo automático
-                            </p>
-                            <p className="text-2xl font-extrabold text-green-600">
-                              $
-                              {(
-                                Math.ceil(
-                                  (Number.parseFloat(formMonto) /
-                                    Number.parseInt(formPlazo)) *
-                                    100,
-                                ) / 100
-                              ).toFixed(2)}
-                            </p>
-                            <p className="text-xs text-green-700">
-                              por día durante {formPlazo} días
-                            </p>
-                          </motion.div>
-                        )}
-
-                      <div className="flex gap-3 pt-2">
-                        {showForm && metaData && (
-                          <Button
-                            data-ocid="meta-principal.cancel_button"
-                            variant="outline"
-                            onClick={() => setShowForm(false)}
-                            className="flex-1 h-12 rounded-2xl font-bold"
-                          >
-                            Cancelar
-                          </Button>
-                        )}
-                        <Button
-                          data-ocid="meta-principal.save_button"
-                          onClick={handleCrearMeta}
-                          className="flex-1 h-12 rounded-2xl bg-yellow-500 hover:bg-yellow-600 font-bold text-white shadow-md shadow-yellow-500/30"
-                        >
-                          {showForm && metaData
-                            ? "Actualizar Meta"
-                            : "Crear Meta 🌟"}
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  /* ---- EXISTING META DASHBOARD ---- */
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="w-full"
-                  >
-                    {/* Meta card */}
-                    <div className="rounded-2xl bg-yellow-400/10 border border-yellow-400/30 px-5 py-4 mb-4">
-                      <p className="text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1">
-                        Tu meta
-                      </p>
-                      <p className="text-lg font-extrabold text-foreground mb-2">
-                        {metaData.nombre}
-                      </p>
-
-                      {/* Progress bar */}
-                      <div className="w-full h-3 rounded-full bg-yellow-200/40 mb-2 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-yellow-500 transition-all duration-700"
-                          style={{ width: `${calcProgresoPct(metaData)}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground mb-3">
-                        <span>
-                          ${metaData.ahorroAcumulado.toFixed(2)} ahorrados
-                        </span>
-                        <span>${metaData.monto} meta total</span>
-                      </div>
-
-                      {/* Stats row */}
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        <div className="rounded-xl bg-card border border-border px-2 py-2">
-                          <p className="text-xs text-muted-foreground">
-                            Por día
+                          <p className="text-xs text-green-700 font-bold uppercase tracking-wide mb-1">
+                            Cálculo automático
                           </p>
-                          <p className="text-sm font-extrabold text-primary">
+                          <p className="text-3xl font-extrabold text-green-600">
                             $
                             {(
-                              metaData.ahorroPorDia + metaData.extraPorDia
+                              Math.ceil(
+                                (Number.parseFloat(formMonto) /
+                                  Number.parseInt(formPlazo)) *
+                                  100,
+                              ) / 100
                             ).toFixed(2)}
                           </p>
-                        </div>
-                        <div className="rounded-xl bg-card border border-border px-2 py-2">
-                          <p className="text-xs text-muted-foreground">Plazo</p>
-                          <p className="text-sm font-extrabold text-primary">
-                            {metaData.plazo} días
+                          <p className="text-sm text-green-700 mt-1">
+                            por día durante {formPlazo} días
                           </p>
-                        </div>
-                        <div className="rounded-xl bg-card border border-border px-2 py-2">
-                          <p className="text-xs text-muted-foreground">
-                            Progreso
+                          <p className="text-xs text-green-600/70 mt-0.5">
+                            para alcanzar ${formMonto} en {formPlazo} días
                           </p>
-                          <p className="text-sm font-extrabold text-primary">
-                            {calcProgresoPct(metaData)}%
-                          </p>
-                        </div>
-                      </div>
-
-                      {metaData.extraPorDia > 0 && (
-                        <div className="mt-3 rounded-xl bg-orange-500/10 border border-orange-400/30 px-3 py-2 text-xs text-orange-700 font-semibold">
-                          +${metaData.extraPorDia.toFixed(2)} extra de días no
-                          logrados distribuidos hoy
-                        </div>
+                        </motion.div>
                       )}
-                    </div>
 
-                    {/* Daily action */}
-                    <div className="rounded-2xl bg-card border border-border px-5 py-4 mb-4">
-                      <p className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
-                        Acción de hoy
-                      </p>
-                      <p className="text-sm text-foreground/80 mb-3">
-                        {alreadyActedToday
-                          ? "Ya marcaste tu progreso de hoy. ¡Vuelve mañana! 🌙"
-                          : `¿Lograste ahorrar $${(metaData.ahorroPorDia + metaData.extraPorDia).toFixed(2)} hoy?`}
-                      </p>
-
-                      {!alreadyActedToday ? (
-                        <div className="flex gap-3">
-                          <Button
-                            data-ocid="meta-principal.confirm_button"
-                            onClick={handleLogrado}
-                            className="flex-1 h-12 rounded-2xl bg-green-500 hover:bg-green-600 font-bold text-white shadow-md shadow-green-500/25 gap-2"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                            Lo Logré ✅
-                          </Button>
-                          <Button
-                            data-ocid="meta-principal.secondary_button"
-                            onClick={handleNoLogrado}
-                            variant="outline"
-                            className="flex-1 h-12 rounded-2xl font-bold border-red-400/40 text-red-500 hover:bg-red-500/10 gap-2"
-                          >
-                            <XCircle className="h-4 w-4" />
-                            No Logré ❌
-                          </Button>
-                        </div>
-                      ) : (
-                        <div
-                          className={`rounded-xl px-4 py-3 text-center text-sm font-semibold ${metaData.ultimaFechaLogro === today ? "bg-green-500/15 text-green-700 border border-green-400/30" : "bg-red-500/10 text-red-600 border border-red-400/30"}`}
+                    <div className="flex gap-3 pt-2">
+                      {showForm && metaData && (
+                        <Button
+                          data-ocid="meta-principal.cancel_button"
+                          variant="outline"
+                          onClick={() => setShowForm(false)}
+                          className="flex-1 h-12 rounded-2xl font-bold"
                         >
-                          {metaData.ultimaFechaLogro === today
-                            ? "¡Genial! Guardaste tu ahorro de hoy 🎉"
-                            : "No te rindas, mañana es otro día 💪"}
-                        </div>
+                          Cancelar
+                        </Button>
                       )}
+                      <Button
+                        data-ocid="meta-principal.save_button"
+                        onClick={handleCrearMeta}
+                        className="flex-1 h-12 rounded-2xl bg-yellow-500 hover:bg-yellow-600 font-bold text-white shadow-md shadow-yellow-500/30"
+                      >
+                        {showForm && metaData
+                          ? "Actualizar Meta"
+                          : "Crear Meta 🌟"}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                /* ---- EXISTING META DASHBOARD ---- */
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="w-full flex flex-col gap-4"
+                >
+                  {/* Meta card */}
+                  <div className="rounded-2xl bg-yellow-400/10 border border-yellow-400/30 px-5 py-4">
+                    <p className="text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1">
+                      Tu meta
+                    </p>
+                    <p className="text-lg font-extrabold text-foreground mb-3">
+                      {metaData.nombre}
+                    </p>
+
+                    {/* Progress bar */}
+                    <div className="w-full h-3 rounded-full bg-yellow-200/40 mb-2 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-yellow-500 transition-all duration-700"
+                        style={{ width: `${calcProgresoPct(metaData)}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground mb-4">
+                      <span>
+                        ${metaData.ahorroAcumulado.toFixed(2)} ahorrados
+                      </span>
+                      <span>${metaData.monto} meta total</span>
                     </div>
 
-                    {/* Historial reciente */}
-                    {metaData.historialDias.length > 0 && (
-                      <div className="rounded-2xl bg-card border border-border px-5 py-4 mb-4">
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">
-                          Últimos días
+                    {/* Stats row */}
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="rounded-xl bg-card border border-border px-2 py-3">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Por día
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {metaData.historialDias.slice(-14).map((d) => (
-                            <div
-                              key={d.fecha}
-                              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${d.logrado ? "bg-green-500 text-white" : "bg-red-400 text-white"}`}
-                              title={d.fecha}
-                            >
-                              {d.logrado ? "✓" : "✗"}
-                            </div>
-                          ))}
-                        </div>
+                        <p className="text-sm font-extrabold text-primary">
+                          $
+                          {(
+                            metaData.ahorroPorDia + metaData.extraPorDia
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="rounded-xl bg-card border border-border px-2 py-3">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Plazo
+                        </p>
+                        <p className="text-sm font-extrabold text-primary">
+                          {metaData.plazo} días
+                        </p>
+                      </div>
+                      <div className="rounded-xl bg-card border border-border px-2 py-3">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Progreso
+                        </p>
+                        <p className="text-sm font-extrabold text-primary">
+                          {calcProgresoPct(metaData)}%
+                        </p>
+                      </div>
+                    </div>
+
+                    {metaData.extraPorDia > 0 && (
+                      <div className="mt-3 rounded-xl bg-orange-500/10 border border-orange-400/30 px-3 py-2 text-xs text-orange-700 font-semibold">
+                        +${metaData.extraPorDia.toFixed(2)} extra de días no
+                        logrados distribuidos en este día
                       </div>
                     )}
+                  </div>
 
-                    {/* Edit button */}
-                    <Button
-                      data-ocid="meta-principal.edit_button"
-                      variant="outline"
-                      onClick={() => {
-                        setFormNombre(metaData.nombre);
-                        setFormMonto(String(metaData.monto));
-                        setFormPlazo(String(metaData.plazo));
-                        setShowForm(true);
-                      }}
-                      className="w-full h-11 rounded-2xl font-semibold border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-                    >
-                      Editar Meta
-                    </Button>
-                  </motion.div>
-                )}
-              </div>
-            </ScrollArea>
+                  {/* Daily action */}
+                  <div className="rounded-2xl bg-card border border-border px-5 py-5">
+                    <p className="text-xs font-bold text-primary uppercase tracking-wide mb-2">
+                      Acción de hoy
+                    </p>
+                    <p className="text-sm text-foreground/80 mb-4">
+                      {alreadyActedToday
+                        ? "Ya marcaste tu progreso de hoy. ¡Vuelve mañana! 🌙"
+                        : `¿Lograste ahorrar $${(metaData.ahorroPorDia + metaData.extraPorDia).toFixed(2)} hoy?`}
+                    </p>
 
-            <div className="px-5 pb-8 pt-4 flex-shrink-0">
-              <Button
-                data-ocid="meta-principal.cancel_button"
-                variant="outline"
-                onClick={() => {
-                  setShowMetaPrincipal(false);
-                  setShowForm(false);
-                }}
-                className="w-full h-12 rounded-2xl font-bold border-border"
-              >
-                Volver al Menú
-              </Button>
+                    {!alreadyActedToday ? (
+                      <div className="flex flex-col gap-3">
+                        <Button
+                          data-ocid="meta-principal.confirm_button"
+                          onClick={handleLogrado}
+                          className="w-full h-14 rounded-2xl bg-green-500 hover:bg-green-600 font-bold text-white shadow-md shadow-green-500/25 gap-2 text-base"
+                        >
+                          <CheckCircle className="h-5 w-5" />
+                          Lo Logré ✅
+                        </Button>
+                        <Button
+                          data-ocid="meta-principal.secondary_button"
+                          onClick={handleNoLogrado}
+                          variant="outline"
+                          className="w-full h-14 rounded-2xl font-bold border-red-400/40 text-red-500 hover:bg-red-500/10 gap-2 text-base"
+                        >
+                          <XCircle className="h-5 w-5" />
+                          No Logré ❌
+                        </Button>
+                      </div>
+                    ) : (
+                      <div
+                        className={`rounded-xl px-4 py-4 text-center text-sm font-semibold ${metaData.ultimaFechaLogro === today ? "bg-green-500/15 text-green-700 border border-green-400/30" : "bg-red-500/10 text-red-600 border border-red-400/30"}`}
+                      >
+                        {metaData.ultimaFechaLogro === today
+                          ? "¡Genial! Guardaste tu ahorro de hoy 🎉"
+                          : "No te rindas, mañana es otro día 💪"}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Historial reciente */}
+                  {metaData.historialDias.length > 0 && (
+                    <div className="rounded-2xl bg-card border border-border px-5 py-4">
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">
+                        Últimos días
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {metaData.historialDias.slice(-14).map((d, idx) => (
+                          <div
+                            key={`${d.fecha}-${idx}`}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${d.logrado ? "bg-green-500 text-white" : "bg-red-400 text-white"}`}
+                            title={d.fecha}
+                          >
+                            {d.logrado ? "✓" : "✗"}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Edit button */}
+                  <Button
+                    data-ocid="meta-principal.edit_button"
+                    variant="outline"
+                    onClick={() => {
+                      setFormNombre(metaData.nombre);
+                      setFormMonto(String(metaData.monto));
+                      setFormPlazo(String(metaData.plazo));
+                      setShowForm(true);
+                    }}
+                    className="w-full h-12 rounded-2xl font-semibold border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                  >
+                    Editar Meta
+                  </Button>
+
+                  {/* Volver */}
+                  <Button
+                    data-ocid="meta-principal.back_button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowMetaPrincipal(false);
+                      setShowForm(false);
+                    }}
+                    className="w-full h-12 rounded-2xl font-bold border-border"
+                  >
+                    Volver al Menú
+                  </Button>
+                </motion.div>
+              )}
+
+              {/* Volver button for form state */}
+              {(!metaData || showForm) && (
+                <div className="mt-4">
+                  <Button
+                    data-ocid="meta-principal.back_button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowMetaPrincipal(false);
+                      setShowForm(false);
+                    }}
+                    className="w-full h-12 rounded-2xl font-bold border-border"
+                  >
+                    Volver al Menú
+                  </Button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -844,12 +866,14 @@ export default function MenuPage() {
         {showProgreso && (
           <motion.div
             data-ocid="progreso.dialog"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col bg-background"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className="fixed inset-0 z-50 bg-background overflow-y-auto overscroll-contain"
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-between px-5 pt-10 pb-4 border-b border-border/30">
               <h2 className="font-display text-xl font-bold text-foreground">
                 Mi Progreso
               </h2>
@@ -863,96 +887,91 @@ export default function MenuPage() {
               </button>
             </div>
 
-            <ScrollArea className="flex-1 px-5">
-              <div className="flex flex-col items-center pb-8 max-w-sm mx-auto w-full">
-                {/* Pig */}
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{
-                    delay: 0.1,
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 20,
-                  }}
-                  className="relative mb-2"
-                >
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-primary/25 blur-md" />
-                  <img
-                    src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
-                    alt="Chibi Boy"
-                    className="relative z-10 w-32 drop-shadow-md"
-                    draggable={false}
-                  />
-                </motion.div>
+            <div className="px-5 pb-10 pt-4 max-w-sm mx-auto w-full flex flex-col items-center gap-4">
+              {/* Pig */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  delay: 0.1,
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                className="relative"
+              >
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-primary/25 blur-md" />
+                <img
+                  src="/assets/generated/chibi-pig-cloud-transparent.dim_400x500.png"
+                  alt="Chibi Boy"
+                  className="relative z-10 w-32 drop-shadow-md"
+                  draggable={false}
+                />
+              </motion.div>
 
-                {/* Retos savings */}
+              {/* Retos savings */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="w-full rounded-3xl bg-primary/15 border border-primary/30 px-6 py-5 text-center"
+              >
+                <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
+                  Ahorrado con Retos 🏆
+                </p>
+                <p className="text-5xl font-extrabold text-primary leading-tight">
+                  ${savingsTotal}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  pesos de retos completados
+                </p>
+              </motion.div>
+
+              {/* Meta Principal savings — SEPARATE SECTION */}
+              {metaData && (
                 <motion.div
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mt-2 w-full rounded-3xl bg-primary/15 border border-primary/30 px-6 py-5 text-center mb-4"
+                  transition={{ delay: 0.3 }}
+                  className="w-full rounded-3xl bg-yellow-400/15 border border-yellow-400/30 px-6 py-5 text-center"
                 >
-                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
-                    Ahorrado con Retos 🏆
+                  <p className="text-xs font-bold text-yellow-600 uppercase tracking-widest mb-1">
+                    Ahorrado · Meta Principal 🌟
                   </p>
-                  <p className="text-5xl font-extrabold text-primary leading-tight">
-                    ${savingsTotal}
+                  <p className="text-4xl font-extrabold text-yellow-600 leading-tight">
+                    ${metaData.ahorroAcumulado.toFixed(2)}
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    pesos de retos completados
+                    de ${metaData.monto} —{" "}
+                    <span className="font-semibold">{metaData.nombre}</span>
+                  </p>
+                  <div className="w-full h-2.5 rounded-full bg-yellow-200/40 mt-3 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-yellow-500 transition-all duration-700"
+                      style={{ width: `${calcProgresoPct(metaData)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-yellow-600 font-bold mt-1">
+                    {calcProgresoPct(metaData)}% completado
                   </p>
                 </motion.div>
+              )}
 
-                {/* Meta Principal savings — SEPARATE SECTION */}
-                {metaData && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="w-full rounded-3xl bg-yellow-400/15 border border-yellow-400/30 px-6 py-5 text-center mb-4"
-                  >
-                    <p className="text-xs font-bold text-yellow-600 uppercase tracking-widest mb-1">
-                      Ahorrado · Meta Principal 🌟
-                    </p>
-                    <p className="text-4xl font-extrabold text-yellow-600 leading-tight">
-                      ${metaData.ahorroAcumulado.toFixed(2)}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      de ${metaData.monto} —{" "}
-                      <span className="font-semibold">{metaData.nombre}</span>
-                    </p>
-                    {/* Progress bar */}
-                    <div className="w-full h-2.5 rounded-full bg-yellow-200/40 mt-3 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-yellow-500 transition-all duration-700"
-                        style={{ width: `${calcProgresoPct(metaData)}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-yellow-600 font-bold mt-1">
-                      {calcProgresoPct(metaData)}% completado
-                    </p>
-                  </motion.div>
-                )}
+              {/* Chibi message */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="relative w-full rounded-2xl bg-accent/20 border border-accent/40 px-4 py-4"
+              >
+                <p className="text-sm text-foreground leading-relaxed font-medium text-center">
+                  {savingsTotal > 0 ||
+                  (metaData && metaData.ahorroAcumulado > 0)
+                    ? "¡Vas muy bien! No es solo dinero, son decisiones que cuentan. ¡Sigue así! ✨"
+                    : "¡Completa retos y cumple tu meta para ver crecer tu alcancía! 🌟"}
+                </p>
+              </motion.div>
 
-                {/* Chibi message */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 }}
-                  className="relative w-full rounded-2xl bg-accent/20 border border-accent/40 px-4 py-4"
-                >
-                  <p className="text-sm text-foreground leading-relaxed font-medium text-center">
-                    {savingsTotal > 0 ||
-                    (metaData && metaData.ahorroAcumulado > 0)
-                      ? "¡Vas muy bien! No es solo dinero, son decisiones que cuentan. ¡Sigue así! ✨"
-                      : "¡Completa retos y cumple tu meta para ver crecer tu alcancía! 🌟"}
-                  </p>
-                </motion.div>
-              </div>
-            </ScrollArea>
-
-            <div className="px-5 pb-8 pt-4 flex-shrink-0">
               <Button
                 data-ocid="progreso.cancel_button"
                 variant="outline"
@@ -971,12 +990,14 @@ export default function MenuPage() {
         {showConfig && (
           <motion.div
             data-ocid="config.dialog"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col bg-background"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className="fixed inset-0 z-50 bg-background overflow-y-auto overscroll-contain"
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <div className="flex items-center justify-between px-5 pt-10 pb-4 flex-shrink-0">
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm flex items-center justify-between px-5 pt-10 pb-4 border-b border-border/30">
               <h2 className="font-display text-xl font-bold text-foreground">
                 Configuración
               </h2>
@@ -990,62 +1011,58 @@ export default function MenuPage() {
               </button>
             </div>
 
-            <ScrollArea className="flex-1 px-5">
-              <div className="flex flex-col gap-5 pb-8 max-w-sm mx-auto w-full">
-                <div>
-                  <label
-                    htmlFor="config-nombre"
-                    className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
-                  >
-                    Nombre
-                  </label>
-                  <Input
-                    id="config-nombre"
-                    data-ocid="config.input"
-                    value={configNombre}
-                    onChange={(e) => setConfigNombre(e.target.value)}
-                    placeholder="¿Cómo te llamas?"
-                    className="rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary h-12"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="config-edad"
-                    className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
-                  >
-                    Edad
-                  </label>
-                  <Input
-                    id="config-edad"
-                    data-ocid="config.input"
-                    type="number"
-                    value={configEdad}
-                    onChange={(e) => setConfigEdad(e.target.value)}
-                    placeholder="¿Cuántos años tienes?"
-                    className="rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary h-12"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="config-meta"
-                    className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
-                  >
-                    Mi Meta
-                  </label>
-                  <Input
-                    id="config-meta"
-                    data-ocid="config.textarea"
-                    value={configMeta}
-                    onChange={(e) => setConfigMeta(e.target.value)}
-                    placeholder="¿Qué quieres lograr con tu ahorro?"
-                    className="rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary h-12"
-                  />
-                </div>
+            <div className="px-5 pb-10 pt-4 max-w-sm mx-auto w-full flex flex-col gap-5">
+              <div>
+                <label
+                  htmlFor="config-nombre"
+                  className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
+                >
+                  Nombre
+                </label>
+                <Input
+                  id="config-nombre"
+                  data-ocid="config.nombre.input"
+                  value={configNombre}
+                  onChange={(e) => setConfigNombre(e.target.value)}
+                  placeholder="¿Cómo te llamas?"
+                  className="rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary h-12"
+                />
               </div>
-            </ScrollArea>
+              <div>
+                <label
+                  htmlFor="config-edad"
+                  className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
+                >
+                  Edad
+                </label>
+                <Input
+                  id="config-edad"
+                  data-ocid="config.edad.input"
+                  type="number"
+                  value={configEdad}
+                  onChange={(e) => setConfigEdad(e.target.value)}
+                  placeholder="¿Cuántos años tienes?"
+                  className="rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary h-12"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="config-meta"
+                  className="block text-xs font-bold text-primary uppercase tracking-wide mb-2"
+                >
+                  Mi Meta
+                </label>
+                <Input
+                  id="config-meta"
+                  data-ocid="config.meta.input"
+                  value={configMeta}
+                  onChange={(e) => setConfigMeta(e.target.value)}
+                  placeholder="¿Qué quieres lograr con tu ahorro?"
+                  className="rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary h-12"
+                />
+              </div>
 
-            <div className="flex flex-col gap-3 px-5 pb-8 pt-4 flex-shrink-0">
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-2">
                 <Button
                   data-ocid="config.cancel_button"
                   variant="outline"

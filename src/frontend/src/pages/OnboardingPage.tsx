@@ -7,7 +7,7 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center bg-background px-6 py-10">
+    <div className="relative flex min-h-screen w-full flex-col items-center bg-background px-6 py-10 overflow-y-auto">
       {/* Decorative background blobs */}
       <div
         aria-hidden
