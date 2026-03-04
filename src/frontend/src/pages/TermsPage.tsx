@@ -13,7 +13,8 @@ export default function TermsPage() {
   const navigate = useNavigate();
   const { userData, setUserData } = useUserData();
 
-  const [nombreEdad, setNombreEdad] = useState(userData.nombre);
+  const [nombre, setNombre] = useState(userData.nombre);
+  const [edad, setEdad] = useState(userData.edad);
   const [metas, setMetas] = useState(userData.metas);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -24,15 +25,18 @@ export default function TermsPage() {
   }
 
   function handleSi() {
-    if (!nombreEdad.trim() || !metas.trim()) {
+    if (!nombre.trim() || !edad.trim() || !metas.trim()) {
       setErrorMsg(
-        "Por favor completa tu nombre/edad y tus metas antes de continuar",
+        "Por favor completa tu nombre, edad y tus metas antes de continuar",
       );
       return;
     }
     setErrorMsg(null);
-    // Parse nombre and edad from the combined field (store together, split on display)
-    setUserData({ nombre: nombreEdad.trim(), edad: "", metas: metas.trim() });
+    setUserData({
+      nombre: nombre.trim(),
+      edad: edad.trim(),
+      metas: metas.trim(),
+    });
     navigate({ to: "/clausulas" });
   }
 
@@ -114,17 +118,35 @@ export default function TermsPage() {
 
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="nombre-edad"
+                  htmlFor="nombre"
                   className="text-sm font-semibold text-foreground"
                 >
-                  ¿Cuál es tu nombre y edad?
+                  ¿Cuál es tu nombre?
                 </Label>
                 <Input
-                  id="nombre-edad"
+                  id="nombre"
                   data-ocid="terms.nombre_input"
-                  placeholder="Ej: María, 15 años"
-                  value={nombreEdad}
-                  onChange={(e) => setNombreEdad(e.target.value)}
+                  placeholder="Ej: María"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className="h-11 rounded-xl border-border bg-background text-sm placeholder:text-muted-foreground focus-visible:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edad"
+                  className="text-sm font-semibold text-foreground"
+                >
+                  ¿Cuántos años tienes?
+                </Label>
+                <Input
+                  id="edad"
+                  data-ocid="terms.edad_input"
+                  type="number"
+                  placeholder="Ej: 15"
+                  value={edad}
+                  onChange={(e) => setEdad(e.target.value)}
                   className="h-11 rounded-xl border-border bg-background text-sm placeholder:text-muted-foreground focus-visible:ring-primary"
                 />
               </div>

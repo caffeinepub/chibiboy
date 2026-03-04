@@ -346,10 +346,9 @@ export default function MenuPage() {
             </p>
             {userData.nombre && (
               <div className="mb-1.5">
-                <p className="text-xs text-muted-foreground">Nombre y edad</p>
+                <p className="text-xs text-muted-foreground">Nombre</p>
                 <p className="text-sm font-semibold text-foreground">
                   {userData.nombre}
-                  {userData.edad ? ` · ${userData.edad} años` : ""}
                 </p>
               </div>
             )}
